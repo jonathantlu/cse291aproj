@@ -57,8 +57,8 @@ Six task types (sizes in tokens):
 | `agent_short` | 3–5 | 200–400 | 100-160 |
 | `agent_long` | 10–12 | 200-400 | 100-160 |
 
-Agents sleep for a tool delay after each step, then append a tool result to their context,
-so their context grows with every step. All agents share one 1,500-token system prompt.
+Agents sleep for a tool delay after each step, then append a tool result to their context.
+All agents share a 1,500 token system prompt, and all 1 step prompts share a 100 token system prompt.
 
 Each workload file is a shuffled list of tasks, generated in three replicas
 (`<name>_670.json` … `_672.json`). During a run, 16 simulated users each repeatedly take the
