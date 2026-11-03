@@ -38,7 +38,7 @@ From `src/`:
 
 ```powershell
 uv sync                                     # install dependencies
-uv run workloads\generate.py                # generate workloads
+uv run generate.py                          # generate workloads
 uv run sweep.py REF E1 E2 E3 E5 --dry-run   # list planned runs
 uv run sweep.py REF E1 E2 E3 E5             # run experiments
 uv run analyze.py                           # results\*.csv and results\plots\
