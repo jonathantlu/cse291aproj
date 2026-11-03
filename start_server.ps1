@@ -1,0 +1,12 @@
+.\llama-b11669\llama-server.exe `
+  -m .\models\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf `
+  -ngl 99 `
+  -fa on `
+  -c 20480 `
+  -np 16 `
+  --kv-unified `
+  --metrics `
+  --host 127.0.0.1 `
+  --port 8080 `
+  --cache-ram 0 `
+  --log-file .\server.log
