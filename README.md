@@ -29,6 +29,7 @@ CSE291a/
     corpus.py          generate the corpus
     experiments.py     experiment definitions
     generate.py        define and generate workloads
+    run.py             run a single workload
     sweep.py           run experiments
 ```
 
