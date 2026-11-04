@@ -41,15 +41,15 @@ From `src/`:
 ```powershell
 uv sync                                     # install dependencies
 uv run generate.py                          # generate workloads
-uv run sweep.py REF E1 E2 E3 E5 --dry-run   # list planned runs
-uv run sweep.py REF E1 E2 E3 E5             # run experiments
-uv run analyze.py                           # results\*.csv and results\plots\
+uv run sweep.py REF E1 E2 E3 E4 --dry-run   # list planned runs
+uv run sweep.py REF E1 E2 E3 E4             # run experiments
+uv run analyze.py                           # results\*.csv
+uv run plotting.py                          # results\plots\*.png
 ```
 
 ## Data
 
-Workload text is sampled from two fixed corpora in `data/corpus/`, built once by `corpus.py`
-and committed to the repository:
+Workload text is sampled from two fixed corpora in `data/corpus/`, built once by `corpus.py`:
 
 | File | Source | Size |
 |---|---|---|
@@ -58,7 +58,7 @@ and committed to the repository:
 
 `generate.py` builds every prompt, user message and tool result from contiguous chunks of
 200–500 tokens (about 4 characters per token), each taken from a random offset in a randomly
-chosen corpus (code or prose, 50/50). The workload files are reproducable, regenerating
+chosen corpus (code or prose, 50/50). The workload files are reproducible, regenerating
 them reproduces the committed files byte for byte.
 
 ## Workloads
@@ -76,7 +76,6 @@ Six task types (sizes in tokens):
 
 Agents sleep for a tool delay after each step, then append a tool result to their context.
 All agents share a 1,500 token system prompt, and all 1 step prompts share a 100 token system prompt.
-The agent prompts additionally 
 
 Each workload file is a shuffled list of tasks, generated in three replicas
 (`<name>_670.json` … `_672.json`). During a run, 16 simulated users each repeatedly take the
@@ -91,7 +90,7 @@ requests to the server at once.
 | E1 | Concurrency | `K = 1, 2, 3, 4, 8` |
 | E2 | Context growth | Agent step count |
 | E3 | Idle periods between agent steps | Tool delay |
-| E5 | Retained contexts and reusable prefixes | shared vs. unique system prompt |
+| E4 | Retained contexts and reusable prefixes | shared vs. unique system prompt |
 
 ## Output
 
@@ -102,5 +101,4 @@ timings, prompt and cached token counts, model output), `tasks.csv`, `telemetry.
 `analyze.py` computes (per run, over steady state): completed and failed tasks,
 throughput, p50/p95/p99 task latency, queueing time, a latency breakdown (queue, prefill,
 decode, tool), peak KV usage, average batch size, cache hit rate, slowdown versus REF, and
-output agreement with REF. It writes `runs.csv`, `summary.csv`, `per_type.csv`, and one 
-plot per experiment.
+output agreement with REF. It writes `runs.csv`, `summary.csv`, `per_type.csv`.
