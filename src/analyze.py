@@ -129,7 +129,8 @@ def main():
             "E3": ("delay", "tool delay (s)")}
 
     for exp, g in summary.reset_index().query("users > 1").groupby("experiment"):
-        fig, axes = plt.subplots(1, 4, figsize=(18, 4))
+        fig, axes = plt.subplots(2, 2, figsize=(11, 8))
+        axes = axes.flatten()
         if exp in XAXIS:
             prefix, xlabel = XAXIS[exp]
             g = g.assign(x=g.workload.str.removeprefix(prefix).astype(float))
