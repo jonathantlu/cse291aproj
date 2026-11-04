@@ -24,7 +24,7 @@ EXPERIMENTS = {
     # idle periods between agent steps
     "E3": lambda reps: runs([f"delay{d}" for d in (0, 1, 4, 16)], [2, 4], reps),
     # reusable prefixes (shared vs unique system prompt)
-    "E5": lambda reps: runs(["agent_heavy", "unique_system"], [2, 4], reps),
+    "E4": lambda reps: runs(["agent_heavy", "unique_system"], [2, 4], reps),
 }
 
 
