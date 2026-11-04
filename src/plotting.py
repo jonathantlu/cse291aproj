@@ -55,7 +55,7 @@ def by_param(summary, experiment, k, prefix):
 def fig_mechanisms(summary, out):
     fig, (a, b) = plt.subplots(1, 2, figsize=(WIDTH, 1.9))
 
-    # (a) context growth: prefill grows quadratically with steps, decode linearly
+    # context growth
     e2 = by_param(summary, "E2", 1, "steps")
     a.plot(e2.x, e2.t_prefill, "o-", label="Prefill")
     a.plot(e2.x, e2.t_decode, "o-", label="Decode")
@@ -66,7 +66,7 @@ def fig_mechanisms(summary, out):
     a.set_ylim(0, max(e2.t_decode.max(), e2.t_prefill.max()) * 1.25)   # headroom for the legend
     a.legend(loc="upper left", fontsize=6)
 
-    # (b) idle periods: tool time replaces queueing time
+    # idle periods
     e3 = by_param(summary, "E3", 2, "delay")
     x, bottom = np.arange(len(e3)), np.zeros(len(e3))
     for col, name in [("t_queue", "Queue"), ("t_prefill", "Prefill"), ("t_decode", "Decode"), ("t_tool", "Tool")]:

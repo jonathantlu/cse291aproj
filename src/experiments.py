@@ -20,7 +20,7 @@ EXPERIMENTS = {
     # concurrency
     "E1": lambda reps: runs(["light", "mixed", "agent_heavy"], [1, 2, 3, 4, 8], reps),
     # context growth
-    "E2": lambda reps: runs([f"steps{n}" for n in (2, 4, 8, 12, 16)], [2], reps),
+    "E2": lambda reps: runs([f"steps{n}" for n in (2, 4, 8, 12, 16)], [1, 2], reps),
     # idle periods between agent steps
     "E3": lambda reps: runs([f"delay{d}" for d in (0, 1, 4, 16)], [2, 4], reps),
     # reusable prefixes (shared vs unique system prompt)

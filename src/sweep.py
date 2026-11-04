@@ -1,6 +1,6 @@
 # sweep.py
 # finished runs are skipped, so an interrupted sweep resumes where it stopped.
-# python sweep.py E1 E5 [--reps 1] [--dry-run]
+# python sweep.py E1 E2 E3 E4 [--reps 1] [--dry-run]
 import argparse, time, traceback
 from pathlib import Path
 from experiments import EXPERIMENTS, run_dir

@@ -25,10 +25,11 @@ CSE291a/
       scheduler.py     scheduler
       server.py        start/stop llama-server
       telemetry.py     background polling of /metrics and /slots
-    analyze.py         tables and plots from all results
+    analyze.py         produces tables from all results
     corpus.py          generate the corpus
     experiments.py     experiment definitions
     generate.py        define and generate workloads
+    plotting.py        plot figures based on summary.csv
     run.py             run a single workload
     sweep.py           run experiments
 ```
@@ -45,21 +46,37 @@ uv run sweep.py REF E1 E2 E3 E5             # run experiments
 uv run analyze.py                           # results\*.csv and results\plots\
 ```
 
+## Data
+
+Workload text is sampled from two fixed corpora in `data/corpus/`, built once by `corpus.py`
+and committed to the repository:
+
+| File | Source | Size |
+|---|---|---|
+| `corpus_code.txt` | All top-level modules of the Python 3.13 standard library (`*.py`), concatenated in sorted order | 4.5M characters |
+| `corpus_prose.txt` | The Python 3.15 documentation in plain-text form (`.txt` files, all sections) | 15.4M characters |
+
+`generate.py` builds every prompt, user message and tool result from contiguous chunks of
+200–500 tokens (about 4 characters per token), each taken from a random offset in a randomly
+chosen corpus (code or prose, 50/50). The workload files are reproducable, regenerating
+them reproduces the committed files byte for byte.
+
 ## Workloads
 
 Six task types (sizes in tokens):
 
-| Type | Steps | Input | Output |
-|---|---|---|---|
-| `short_short` | 1 | 400–600 | 60–90 |
-| `short_long` | 1 | 400–600 | 300-500 |
-| `long_short` | 1 | 4,000–6,000 | 60–90 |
-| `long_long` | 1 | 4,000–6,000 | 300-500 |
-| `agent_short` | 3–5 | 200–400 | 100-160 |
-| `agent_long` | 10–12 | 200-400 | 100-160 |
+| Type | Steps | Input | Output | Tool Output | Agent Final |
+|---|---|---|---|---|---|
+| `short_short` | 1 | 400–600 | 60–90 |||
+| `short_long` | 1 | 400–600 | 300-500 |||
+| `long_short` | 1 | 4,000–6,000 | 60–90 |||
+| `long_long` | 1 | 4,000–6,000 | 300-500 |||
+| `agent_short` | 3–5 | 200–400 | 100-160 | 200-600 | 200-400 |
+| `agent_long` | 10–12 | 200-400 | 100-160 | 200-600 | 200-400 |
 
 Agents sleep for a tool delay after each step, then append a tool result to their context.
 All agents share a 1,500 token system prompt, and all 1 step prompts share a 100 token system prompt.
+The agent prompts additionally 
 
 Each workload file is a shuffled list of tasks, generated in three replicas
 (`<name>_670.json` … `_672.json`). During a run, 16 simulated users each repeatedly take the
