@@ -3,6 +3,7 @@
 # latency that slowdown is measured against, and the reference outputs for the quality check.
 
 from pathlib import Path
+import json
 
 ROOT = Path(__file__).parent.parent
 WORKLOADS = ROOT / "data" / "workloads"
@@ -13,6 +14,17 @@ def runs(workloads, ks, reps, profiles=("default",), users=16, policy="fifo"):
             for w in workloads for p in profiles for k in ks
             for r in range(1 if k == 1 else reps)]
 
+def open_loop(reps):
+    # each open-loop file: FIFO at its best K vs slot (run arrivals.py first)
+    path = WORKLOADS / "open_plan.json"
+    if not path.exists():
+        return []
+    specs = []
+    for p in json.loads(path.read_text()):
+        w = str(WORKLOADS / p["workload"])
+        specs.append(dict(workload=w, k=p["best_k"], profile="default", users=0, policy="fifo"))
+        specs.append(dict(workload=w, k=16, profile="default", users=0, policy="slot"))
+    return specs
 
 EXPERIMENTS = {
     # isolated references
@@ -27,6 +39,7 @@ EXPERIMENTS = {
     "E4": lambda reps: runs(["agent_heavy", "unique_system"], [2, 4], reps),
     "P1": lambda reps: (runs(["light", "mixed", "agent_heavy"], [16], reps, policy="slot")
                        + runs(["light", "mixed", "agent_heavy"], [16], reps, policy="slot_discard")),
+    "P2": open_loop,
 }
 
 

@@ -87,7 +87,7 @@ def run_metrics(run):
         "t_queue": b.queue.mean(), "t_prefill": b.prefill.mean() / 1000,
         "t_decode": b.decode.mean() / 1000, "t_tool": b.tool_s.mean(),
         "peak_kv_active": peak_active_kv(good),
-        "cache_hit": good["cached_tokens"].sum() / prompt_total if prompt_total else np.nan,
+        "cache_hit": 1 - good["prefill_n"].sum() / prompt_total if prompt_total else np.nan,
         "batch_per_decode": np.nan, "peak_kv_slots": np.nan,
         "overhead_ms": 1000 * good["t_before_queue"].mean() if "t_before_queue" in good else np.nan,
     }
@@ -118,12 +118,13 @@ def main():
     if not runs:
         raise SystemExit("no finished runs under results/")
     # reference = the same replica and profile run with 1 user (each task alone)
-    refs = {(r["key"]["replica"], r["key"]["profile"]): r for r in runs if r["key"]["users"] == 1}
+    base = lambda key: re.sub(r"_load\d+", "", key["replica"])
+    refs = {(base(r["key"]), r["key"]["profile"]): r for r in runs if r["key"]["users"] == 1}
 
     rows, types = [], []
     for run in runs:
         key = run["key"]
-        slow, match = reference_metrics(run, refs.get((key["replica"], key["profile"])))
+        slow, match = reference_metrics(run, refs.get((base(key), key["profile"])))
         rows.append(key | run_metrics(run) | {"slowdown_median": slow.median(), "output_match": match})
         for ttype, g in run["tasks"].groupby("type"):
             okg = g[g.status == "ok"]

@@ -41,3 +41,15 @@ async def run_users(tasks, sched, clock, n_users):
 
     await asyncio.gather(*(user() for _ in range(n_users)))
     return outcomes
+
+
+async def run_open(tasks, sched, clock):
+    # open loop: each task starts at its own arrival_s, however busy the system is
+    outcomes = []
+
+    async def start(task):
+        await asyncio.sleep(max(0.0, task["arrival_s"] - clock()))
+        await simulate_task(task, sched, clock, outcomes)
+
+    await asyncio.gather(*(start(t) for t in tasks))
+    return outcomes

@@ -6,7 +6,7 @@ from pathlib import Path
 import httpx
 from inference import server
 from inference.scheduler import POLICIES
-from inference.agents import run_users
+from inference.agents import run_users, run_open
 from inference.telemetry import poll
 from experiments import RESULTS
 
@@ -33,7 +33,10 @@ async def execute(tasks, policy, k, users):
     async with httpx.AsyncClient(timeout=600) as client:
         sched = POLICIES[policy](client, clock, k)
         poller = asyncio.create_task(poll(client, clock, telemetry, stop))
-        outcomes = await run_users(tasks, sched, clock, users)
+        if users == 0:
+            outcomes = await run_open(tasks, sched, clock)
+        else:
+            outcomes = await run_users(tasks, sched, clock, users)
         wall = clock()
         stop.set()
         await poller
