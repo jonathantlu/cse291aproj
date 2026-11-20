@@ -8,8 +8,8 @@ ROOT = Path(__file__).parent.parent
 WORKLOADS = ROOT / "data" / "workloads"
 RESULTS = ROOT / "results"
 
-def runs(workloads, ks, reps, profiles=("default",), users=16):
-    return [dict(workload=f"{WORKLOADS}/{w}_67{r}.json", k=k, profile=p, users=users)
+def runs(workloads, ks, reps, profiles=("default",), users=16, policy="fifo"):
+    return [dict(workload=f"{WORKLOADS}/{w}_67{r}.json", k=k, profile=p, users=users, policy=policy)
             for w in workloads for p in profiles for k in ks
             for r in range(1 if k == 1 else reps)]
 
@@ -25,9 +25,11 @@ EXPERIMENTS = {
     "E3": lambda reps: runs([f"delay{d}" for d in (0, 1, 4, 16)], [2, 4], reps),
     # reusable prefixes (shared vs unique system prompt)
     "E4": lambda reps: runs(["agent_heavy", "unique_system"], [2, 4], reps),
+    "P1": lambda reps: (runs(["light", "mixed", "agent_heavy"], [16], reps, policy="slot")
+                       + runs(["light", "mixed", "agent_heavy"], [16], reps, policy="slot_discard")),
 }
 
 
 def run_dir(experiment, spec, policy="fifo"):
     name = Path(spec["workload"]).stem
-    return RESULTS / experiment / f"{name}_K{spec['k']}_{spec['profile']}_{policy}_U{spec['users']}"
+    return RESULTS / experiment / f"{name}_K{spec['k']}_{spec['profile']}_{spec.get('policy', 'fifo')}_U{spec['users']}"

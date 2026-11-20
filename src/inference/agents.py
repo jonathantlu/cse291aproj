@@ -28,6 +28,7 @@ async def simulate_task(task, sched, clock, outcomes):
         out["end"] = clock()
         out["latency"] = out["end"] - out["start"]
         outcomes.append(out)
+        sched.task_done(task["task_id"])
 
 
 async def run_users(tasks, sched, clock, n_users):

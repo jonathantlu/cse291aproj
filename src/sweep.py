@@ -14,19 +14,19 @@ ap.add_argument("--dry-run", action="store_true")
 a = ap.parse_args()
 
 todo = [(e, s) for e in a.experiments for s in EXPERIMENTS[e](a.reps)
-        if not (Path(run_dir(e, s, a.policy)) / "meta.json").exists()]
+        if not (Path(run_dir(e, s)) / "meta.json").exists()]
 print(f"{len(todo)} runs to do")
 if a.dry_run:
     for e, s in todo:
-        print(" ", run_dir(e, s, a.policy))
+        print(" ", run_dir(e, s))
     raise SystemExit
 
 started = time.time()
 for i, (e, s) in enumerate(todo, 1):
-    out = Path(run_dir(e, s, a.policy))
+    out = Path(run_dir(e, s))
     print(f"[{i}/{len(todo)}] {out}")
     try:
-        run_one(s["workload"], s["k"], s["profile"], s["users"], a.policy, out)
+        run_one(s["workload"], s["k"], s["profile"], s["users"], s.get("policy", a.policy), out)
     except Exception:
         out.mkdir(parents=True, exist_ok=True)
         (out / "error.txt").write_text(traceback.format_exc())

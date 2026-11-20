@@ -89,6 +89,7 @@ def run_metrics(run):
         "peak_kv_active": peak_active_kv(good),
         "cache_hit": good["cached_tokens"].sum() / prompt_total if prompt_total else np.nan,
         "batch_per_decode": np.nan, "peak_kv_slots": np.nan,
+        "overhead_ms": 1000 * good["t_before_queue"].mean() if "t_before_queue" in good else np.nan,
     }
     m["t_other"] = b.latency.mean() - m["t_queue"] - m["t_prefill"] - m["t_decode"] - m["t_tool"]
     if not tel.empty:

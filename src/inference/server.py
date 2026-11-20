@@ -9,6 +9,8 @@ MODEL = ROOT / "models" / "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
 HOST = "127.0.0.1"
 PORT = 8080
 BASE_URL = f"http://{HOST}:{PORT}"
+SLOT_DIR = ROOT / "results" / "slot_cache"
+
 
 BASE = dict(ctx=20480, slots=16, cache_ram=0)   # main configuration
 PROFILES = {
@@ -27,6 +29,7 @@ def server_args(profile):
             "-c", str(p["ctx"]),
             "-np", str(p["slots"]),
             "--kv-unified",
+            "--slot-save-path", str(SLOT_DIR),
             "--cache-ram", str(p["cache_ram"]),
             "--metrics",
             "--host", HOST,
@@ -44,6 +47,7 @@ def is_up():
 def start(profile, log_path, timeout_s=180):
     if is_up():
         raise RuntimeError(f"a server is already running at {BASE_URL}")
+    SLOT_DIR.mkdir(parents=True, exist_ok=True)
     proc = subprocess.Popen(server_args(profile) + ["--log-file", str(log_path)],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     deadline = time.time() + timeout_s
